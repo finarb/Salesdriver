@@ -1,0 +1,512 @@
+var jsHeight = screen.height;
+var jsWidth = screen.width;
+Shiny.onInputChange("GetScreenHeight",jsHeight);
+Shiny.onInputChange("GetScreenWidth",jsWidth);
+});'
+# JS code to get userAgent information for browser detection
+jsbrowser <- "$(document).on('shiny:connected', function(e) {
+var whichbrowser = navigator.userAgent;
+Shiny.onInputChange('whichbrowser', whichbrowser);
+});
+"
+#ga code
+gacode<-"(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-73066745-6', 'auto');
+ga('send', 'pageview');"
+####load correct app name
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+suppressWarnings(filename<-gsub(".RData","",rownames(filelist)[filelist$mtime==max(filelist$mtime)],ignore.case = TRUE))
+suppressWarnings(filedate<-max(filelist$mtime))
+# Declare packages options
+options(sqldf.driver = "SQLite") # as per FAQ #7 force SQLite
+options(gsubfn.engine = "R") # as per FAQ #5 use R code rather than tcltk
+#source all files
+# enforce at least this version of dplyr, because an earlier version on CRAN seems to have somewhat buggy resulting,
+# in PricingIndex_PM in one segment of the data being propagated to another data segment
+stopifnot( packageVersion("dplyr") >= '0.4.3.9001' )
+#load correct data
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+# errappUI <- parse(file = 'err/ui.R')
+# errappServer <- eval(parse(file = 'err/server.R'))
+result <- tryCatch({
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+load(datafilename)
+loadmsg=paste0("Loading ", datafilename, "...")
+}, warning = function(war) {
+warn(logger, "data Not found")
+loadmsg="DataNotFound"
+}, error = function(err) {
+error(logger, "data Not found")
+loadmsg="DataNotFound"
+}, finally = {
+})
+options(java.parameters = "-Xmx3072m")
+options(shiny.trace = FALSE)
+# options(shiny.error=recover)
+options(shiny.sanitize.errors=TRUE)
+# Declare packages
+suppressMessages(library(shinydashboard))
+suppressMessages(library(DT))
+suppressMessages(library(rvest))
+suppressMessages(library(svglite))
+suppressMessages(library(svgPanZoom))
+suppressMessages(library(visNetwork))
+suppressMessages(library(k3d3))
+suppressMessages(library(shiny))
+suppressMessages(library(htmlwidgets))
+suppressMessages(library(sparkline))
+suppressMessages(library(readr))
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr))
+suppressMessages(library(magrittr))
+suppressMessages(library(sqldf))
+suppressMessages(library(knitr))
+suppressMessages(library(tidyr))
+suppressMessages(library(shinyjs))
+suppressMessages(require(RJSONIO))
+suppressMessages(library(rjson))
+suppressMessages(library(jsonlite))
+suppressMessages(library(highcharter))
+suppressMessages(library(reshape2))
+suppressMessages(library(lubridate))
+suppressMessages(library(wordcloud))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(plotly))
+suppressMessages(library(shinyWidgets))
+suppressMessages(library(log4r))
+#set logger
+# Create a new logger object with create.logger().
+logger <- create.logger()
+# Set the logger's file output: currently only allows flat files.
+logfile(logger) <- file.path('./www/logging/base.log')
+# Set the current level of the logger.
+level(logger) <- "DEBUG"
+# library(plotly)
+# library(radialNetworkR)
+# library(parcoords)
+# library(networkD3)
+#devtools::install_github("finarb/k3d3")
+# JS code to get screen height
+if(!exists("code_version")) code_version <- "1.3.1.0"
+# Need to be placed here so it initialized after shiny is ready
+jscode <- '$(document).on("shiny:connected", function(e) {
+var jsHeight = screen.height;
+var jsWidth = screen.width;
+Shiny.onInputChange("GetScreenHeight",jsHeight);
+Shiny.onInputChange("GetScreenWidth",jsWidth);
+});'
+# JS code to get userAgent information for browser detection
+jsbrowser <- "$(document).on('shiny:connected', function(e) {
+var whichbrowser = navigator.userAgent;
+Shiny.onInputChange('whichbrowser', whichbrowser);
+});
+"
+#ga code
+gacode<-"(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-73066745-6', 'auto');
+ga('send', 'pageview');"
+####load correct app name
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+suppressWarnings(filename<-gsub(".RData","",rownames(filelist)[filelist$mtime==max(filelist$mtime)],ignore.case = TRUE))
+suppressWarnings(filedate<-max(filelist$mtime))
+# Declare packages options
+options(sqldf.driver = "SQLite") # as per FAQ #7 force SQLite
+options(gsubfn.engine = "R") # as per FAQ #5 use R code rather than tcltk
+#source all files
+# enforce at least this version of dplyr, because an earlier version on CRAN seems to have somewhat buggy resulting,
+# in PricingIndex_PM in one segment of the data being propagated to another data segment
+stopifnot( packageVersion("dplyr") >= '0.4.3.9001' )
+#load correct data
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+# errappUI <- parse(file = 'err/ui.R')
+# errappServer <- eval(parse(file = 'err/server.R'))
+result <- tryCatch({
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+load(datafilename)
+loadmsg=paste0("Loading ", datafilename, "...")
+}, warning = function(war) {
+warn(logger, "data Not found")
+loadmsg="DataNotFound"
+}, error = function(err) {
+error(logger, "data Not found")
+loadmsg="DataNotFound"
+}, finally = {
+})
+load(datafilename)
+options(java.parameters = "-Xmx3072m")
+options(shiny.trace = FALSE)
+# options(shiny.error=recover)
+options(shiny.sanitize.errors=TRUE)
+# Declare packages
+suppressMessages(library(shinydashboard))
+suppressMessages(library(DT))
+suppressMessages(library(rvest))
+suppressMessages(library(svglite))
+suppressMessages(library(svgPanZoom))
+suppressMessages(library(visNetwork))
+suppressMessages(library(k3d3))
+suppressMessages(library(shiny))
+suppressMessages(library(htmlwidgets))
+suppressMessages(library(sparkline))
+suppressMessages(library(readr))
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr))
+suppressMessages(library(magrittr))
+suppressMessages(library(sqldf))
+suppressMessages(library(knitr))
+suppressMessages(library(tidyr))
+suppressMessages(library(shinyjs))
+suppressMessages(require(RJSONIO))
+suppressMessages(library(rjson))
+suppressMessages(library(jsonlite))
+suppressMessages(library(highcharter))
+suppressMessages(library(reshape2))
+suppressMessages(library(lubridate))
+suppressMessages(library(wordcloud))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(plotly))
+suppressMessages(library(shinyWidgets))
+suppressMessages(library(log4r))
+#set logger
+# Create a new logger object with create.logger().
+logger <- create.logger()
+# Set the logger's file output: currently only allows flat files.
+logfile(logger) <- file.path('./www/logging/base.log')
+# Set the current level of the logger.
+level(logger) <- "DEBUG"
+# library(plotly)
+# library(radialNetworkR)
+# library(parcoords)
+# library(networkD3)
+#devtools::install_github("finarb/k3d3")
+# JS code to get screen height
+if(!exists("code_version")) code_version <- "1.3.1.0"
+# Need to be placed here so it initialized after shiny is ready
+jscode <- '$(document).on("shiny:connected", function(e) {
+var jsHeight = screen.height;
+var jsWidth = screen.width;
+Shiny.onInputChange("GetScreenHeight",jsHeight);
+Shiny.onInputChange("GetScreenWidth",jsWidth);
+});'
+# JS code to get userAgent information for browser detection
+jsbrowser <- "$(document).on('shiny:connected', function(e) {
+var whichbrowser = navigator.userAgent;
+Shiny.onInputChange('whichbrowser', whichbrowser);
+});
+"
+#ga code
+gacode<-"(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-73066745-6', 'auto');
+ga('send', 'pageview');"
+####load correct app name
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+suppressWarnings(filename<-gsub(".RData","",rownames(filelist)[filelist$mtime==max(filelist$mtime)],ignore.case = TRUE))
+suppressWarnings(filedate<-max(filelist$mtime))
+# Declare packages options
+options(sqldf.driver = "SQLite") # as per FAQ #7 force SQLite
+options(gsubfn.engine = "R") # as per FAQ #5 use R code rather than tcltk
+#source all files
+# enforce at least this version of dplyr, because an earlier version on CRAN seems to have somewhat buggy resulting,
+# in PricingIndex_PM in one segment of the data being propagated to another data segment
+stopifnot( packageVersion("dplyr") >= '0.4.3.9001' )
+#load correct data
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+# errappUI <- parse(file = 'err/ui.R')
+# errappServer <- eval(parse(file = 'err/server.R'))
+loadmsg <- tryCatch({
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+load(datafilename)
+loadmsg=paste0("Loading ", datafilename, "...")
+}, warning = function(war) {
+warn(logger, "data found with error")
+load(datafilename)
+loadmsg="DataFoundWithError"
+}, error = function(err) {
+error(logger, "data Not found")
+loadmsg="DataNotFound"
+}, finally = {
+})
+length(datafilename)>=1
+datafilename[1]
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+length(datafilename)
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+if (length(datafilename)>=1){
+load(datafilename[1])
+loadmsg=paste0("Loading ", datafilename, "...")
+}
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+load(datafilename[1])
+loadmsg <- tryCatch({
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+load(datafilename)
+loadmsg=paste0("Loading ", datafilename, "...")
+}, warning = function(war) {
+warn(logger, "data found with error")
+loadmsg=paste0("Loading ", datafilename, "...DataFoundWithError")
+}, error = function(err) {
+error(logger, "data Not found")
+loadmsg="DataNotFound"
+}, finally = {
+})
+runApp()
+runApp()
+runApp()
+options(java.parameters = "-Xmx3072m")
+options(shiny.trace = FALSE)
+# options(shiny.error=recover)
+options(shiny.sanitize.errors=TRUE)
+# Declare packages
+suppressMessages(library(shinydashboard))
+suppressMessages(library(DT))
+suppressMessages(library(rvest))
+suppressMessages(library(svglite))
+suppressMessages(library(svgPanZoom))
+suppressMessages(library(visNetwork))
+suppressMessages(library(k3d3))
+suppressMessages(library(shiny))
+suppressMessages(library(htmlwidgets))
+suppressMessages(library(sparkline))
+suppressMessages(library(readr))
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr))
+suppressMessages(library(magrittr))
+suppressMessages(library(sqldf))
+suppressMessages(library(knitr))
+suppressMessages(library(tidyr))
+suppressMessages(library(shinyjs))
+suppressMessages(require(RJSONIO))
+suppressMessages(library(rjson))
+suppressMessages(library(jsonlite))
+suppressMessages(library(highcharter))
+suppressMessages(library(reshape2))
+suppressMessages(library(lubridate))
+suppressMessages(library(wordcloud))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(plotly))
+suppressMessages(library(shinyWidgets))
+suppressMessages(library(log4r))
+#set logger
+# Create a new logger object with create.logger().
+logger <- create.logger()
+# Set the logger's file output: currently only allows flat files.
+logfile(logger) <- file.path('./www/logging/base.log')
+# Set the current level of the logger.
+level(logger) <- "DEBUG"
+# library(plotly)
+# library(radialNetworkR)
+# library(parcoords)
+# library(networkD3)
+#devtools::install_github("finarb/k3d3")
+# JS code to get screen height
+if(!exists("code_version")) code_version <- "1.3.1.0"
+# Need to be placed here so it initialized after shiny is ready
+jscode <- '$(document).on("shiny:connected", function(e) {
+var jsHeight = screen.height;
+var jsWidth = screen.width;
+Shiny.onInputChange("GetScreenHeight",jsHeight);
+Shiny.onInputChange("GetScreenWidth",jsWidth);
+});'
+# JS code to get userAgent information for browser detection
+jsbrowser <- "$(document).on('shiny:connected', function(e) {
+var whichbrowser = navigator.userAgent;
+Shiny.onInputChange('whichbrowser', whichbrowser);
+});
+"
+#ga code
+gacode<-"(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-73066745-6', 'auto');
+ga('send', 'pageview');"
+####load correct app name
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+suppressWarnings(filename<-gsub(".RData","",rownames(filelist)[filelist$mtime==max(filelist$mtime)],ignore.case = TRUE))
+suppressWarnings(filedate<-max(filelist$mtime))
+# Declare packages options
+options(sqldf.driver = "SQLite") # as per FAQ #7 force SQLite
+options(gsubfn.engine = "R") # as per FAQ #5 use R code rather than tcltk
+#source all files
+# enforce at least this version of dplyr, because an earlier version on CRAN seems to have somewhat buggy resulting,
+# in PricingIndex_PM in one segment of the data being propagated to another data segment
+stopifnot( packageVersion("dplyr") >= '0.4.3.9001' )
+#load correct data
+suppressWarnings(filelist<-file.info(list.files(path = ".", pattern = "RData")))
+datafilename=rownames(filelist)[filelist$mtime==max(filelist$mtime)]
+length(datafilename)>=1
+datafilename[1]
+runApp()
+runApp()
+shinyApp(
+ui = fluidPage(
+textOutput("errin")
+),
+server = function(input, output) {
+output$errin <- renderText({
+"No Data Found"
+})
+}
+)
+runApp()
+length(datafilename)>=1
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+shiny::runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+values$ddchanged==FALSE
+values$ddchanged==FALSE
+values$ddchanged==FALSE
+values$ddchanged==FALSE
+values$ddchanged==FALSE
+values$ddchanged
+runApp()
+values$ddchanged
+values$ddchanged
+values$ddchanged
+runApp()
+runApp()
+values$ddchanged
+values$ddchanged
+runApp()
+Q
+runApp()
+values$ddchanged
+values$ddchanged
+values$ddchanged
+values$ddchanged
+values$ddchanged
+runApp()
+if ("ic" %in% names(values)){
+if (values$ic==TRUE){
+val="checked"
+}else{
+val=""
+}
+}else{
+val=""
+}
+shiny::runApp()
+shiny::runApp()
+shiny::runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+runApp()
+out <- tryCatch(
+{
+table_bmwin <- top_tables[[input$metrictype]][[input$sharebasetype]][[input$sharebase]][[input$prodhier]][[input$prod]][[input$Martyp]][[input$currentperiod]][[input$refperiod]]$winners
+if (!is.null(table_bmwin)){
+if (input$metrictype!="Value"){
+max_threshold <- round(max(table_bmwin[,6], na.rm = T), 1)
+min_threshold <- round(min(table_bmwin[,6], na.rm = T), 1)
+table_bmwin <- table_bmwin[table_bmwin[,6] >= minimal_treshold, ]
+}else{
+max_threshold <- round(max(table_bmwin[,3], na.rm = T), 1)
+min_threshold <- round(min(table_bmwin[,3], na.rm = T), 1)
+table_bmwin <- table_bmwin[table_bmwin[,3] >= minimal_treshold, ]
+}
+if (nrow(table_bmwin)>0) {
+numericInput("winthreshold", "", width = "45px", value = minimal_treshold, min = min_threshold-0.1, max = max_threshold+0.1, step = 0.1)
+}else{
+numericInput("winthreshold", "", width = "45px", value = minimal_treshold, min = minimal_treshold-0.1, max = minimal_treshold+0.1, step = 0.1)
+}
+}else{
+numericInput("winthreshold", "", width = "45px", value = minimal_treshold, min = minimal_treshold-0.1, max = minimal_treshold+0.1, step = 0.1)
+}
+},
+error=function(cond) {
+numericInput("winthreshold", "", width = "45px", value = minimal_treshold, min = minimal_treshold-0.1, max = minimal_treshold+0.1, step = 0.1)
+},
+warning=function(cond) {
+numericInput("winthreshold", "", width = "45px", value = minimal_treshold, min = minimal_treshold-0.1, max = minimal_treshold+0.1, step = 0.1)
+},
+finally={
+}
+)
+runApp()
+runApp()
+shiny::runApp()
+runApp()
+runApp()
+shiny::runApp()
+runApp()
+runApp()
+shiny::runApp()
+runApp()
+shiny::runApp()
+load("~/Dropbox/Active_Projects/PnG/Repositories/shiny/V103_Dev/Development/Template_V103/THAILAND_FM.RData")
+runApp()
+shiny::runApp()
+runApp()
+top_tables$Value$MEGACATEGORY$`FACIAL SKIN CARE`$MEGACATEGORY$`FACIAL SKIN CARE`$Retailer$FYTD$`Year ago`$winners
+runApp()
+shiny::runApp()
+runApp()
+install.packages("svglite")
+runApp()
+shiny::runApp()
+install.packages("svgPanZoom")
+shiny::runApp()
+install.packages("visNetwork")
+runApp()
+devtools::install_github("finarb/k3d3")
+runApp()
+install.packages("sparkline")
+runApp()
+install.packages("shinyWidgets")
+runApp()
+install.packages("log4r")
+runApp()
+shiny::runApp()
+install.packages("shinydashboard")
+runApp()
+devtools::install_github("finarb/DT")
+install.packages("devtools")
+devtools::install_github("finarb/DT")
+runApp()
+install.packages("rvest")
+runApp()
+install.packages("svglite")
+install.packages("svgPanZoom")
+install.packages("svgPanZoom")
+devtools::install_github("finarb/k3d3")
+runApp()
+install.packages("visNetwork")
+runApp()
+install.packages("sparkline")
+runApp()
+install.packages("readr")
+runApp()
+install.packages("dplyr")
+runApp()
+install.packages("sqldf")
+runApp()
+install.packages(c("knitr", "tidyr", "shinyjs", "RJSONIO", "rjson", "jsonlite", "highcharter", "reshape2", "lubridate", "wordcloud", "RColorBrewer", "plotly", "shinyWidgets", "log4r"))
+shiny::runApp()
+install.packages("reshape2")
+runApp()
+runApp()

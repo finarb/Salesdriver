@@ -1,0 +1,3 @@
+ui = fluidPage(
+  textOutput("errin")
+)
